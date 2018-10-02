@@ -1,6 +1,8 @@
 $(document).ready(function() {
 
-    var disneyMovies = ["the lion king", "toy story", "cinderella", "finding nemo"];
+    var disneyMovies = ["finding dory", "toy story", "cinderella", "finding nemo"];
+    var clickCount = 0;
+    var disneyMovie = "";
 
     function renderMovies () {
 
@@ -17,25 +19,78 @@ $(document).ready(function() {
         }
     }
 
-    function getMovieGif () {
+    function getMovieGif (disneyMovie, clickCount) {
 
-        var disneyMovie = $(this).attr('data-name');
-        console.log(disneyMovie);
+        var offSet = clickCount * 10;
 
         var apiKey = 'OSVrEhvlyTyFXiAvrvygeiXmjLtLocbD';
-        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + disneyMovie + "&api_key=" + apiKey + "&limit=10";
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + disneyMovie + "&api_key=" + apiKey + "&limit=10&offset=" + offSet;
 
         $.ajax({
             url: queryURL,
             method: "GET"
           }).then (function (response) {
 
+            var resultGifs = response.data;
 
+            console.log(resultGifs);
+
+            for (var i = 0; i < resultGifs.length; i++) {
+
+                var gifDiv = $('<div class="gif-margin">');
+                var p1 = $('<div>').text('Rating: ' + resultGifs[i].rating);
+                var downloadLink = $('<a href="' + resultGifs[i].images.preview_webp.url + '" target="_blank">Open in new window</a>');
+                var p2 = $('<p>');
+
+                var gifImage = $('<img data-state="still" class="gif">');
+                
+                gifImage.attr('data-still', resultGifs[i].images.fixed_height_still.url);
+                gifImage.attr('data-animate', resultGifs[i].images.fixed_height.url);
+                gifImage.attr('src', resultGifs[i].images.fixed_height_still.url);
+                p2.append(downloadLink);
+                gifDiv.append(p1);
+                gifDiv.append(p2);
+                gifDiv.append(gifImage);
+                gifDiv.append('<hr class="style6">');
+                $('#gifs').prepend(gifDiv);
+            }
           });
-    
     }
 
-    $(document).on('click', '.movie-btn', getMovieGif);
+    function changeGifState () {
+        
+        var state = $(this).attr("data-state");
+        
+        if (state === "still") {
+          $(this).attr("src", $(this).attr("data-animate"));
+          $(this).attr("data-state", "animate");
+        } else {
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still");
+        }
+    }
+
+    $(document).on('click', '.movie-btn', function () {
+        
+        if (disneyMovie.length > 0) {
+
+            if ($(this).attr('data-name').toLowerCase() == disneyMovie.toLowerCase())
+                clickCount = clickCount + 1;
+
+            else {
+
+                clickCount = 0;
+                $('#gifs').empty();
+            }  
+                
+        }
+
+        else   
+            clickCount = 0;
+
+        disneyMovie = $(this).attr('data-name');
+        getMovieGif(disneyMovie, clickCount);
+    });
 
     $('#add-movie').on('click', function(event) {
 
@@ -49,6 +104,8 @@ $(document).ready(function() {
             renderMovies();
         }
     });
+
+    $(document).on("click", '.gif', changeGifState);
 
     renderMovies();
 });

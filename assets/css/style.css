@@ -1,3 +1,7 @@
+* {
+    font-family: 'Mali', cursive;
+}
+
 .center {
     text-align: center;
     font-weight: bold;
@@ -5,4 +9,27 @@
 
 .movie-btn {
     margin: 15px;
+}
+
+.gif-margin {
+    margin: 2px;
+}
+
+.gif-margin:hover {
+    cursor: pointer;
+}
+
+hr.style6 {
+	background-color: #fff;
+	border-top: 2px dotted #8c8b8b;
+}
+
+.jumbotron {
+    background-color:lightblue;
+}
+
+img {
+
+    width: 250px;
+    height: 250px;
 }
